@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dryland Readiness">
+  <rect width="512" height="512" rx="96" fill="#0E4A5B"/>
+  <g>
+    <rect x="92"  y="276" width="88" height="120" rx="10" fill="#7FA9AE"/>
+    <rect x="212" y="196" width="88" height="200" rx="10" fill="#EAF3F1"/>
+    <rect x="332" y="116" width="88" height="280" rx="10" fill="#E0A32B"/>
+  </g>
+</svg>
