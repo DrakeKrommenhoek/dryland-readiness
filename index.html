@@ -64,13 +64,22 @@ body{
   font:400 16px/1.55 "Public Sans",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:460px;margin:0 auto;padding:0 18px 64px}
+.wrap{
+  max-width:460px;margin:0 auto;padding:0 18px 64px;
+  /* iOS notch/home indicator. Every inset resolves to 0 elsewhere, so
+     these collapse back to the values above off-iOS. */
+  padding-left:calc(18px + env(safe-area-inset-left));
+  padding-right:calc(18px + env(safe-area-inset-right));
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+}
 
 /* header: timing-console strip */
 .top{
   background:var(--water);
-  margin:0 -18px 22px;
-  padding:16px 18px 0;
+  margin:0 calc(-18px - env(safe-area-inset-right)) 22px calc(-18px - env(safe-area-inset-left));
+  padding:calc(16px + env(safe-area-inset-top)) 18px 0;
+  padding-left:calc(18px + env(safe-area-inset-left));
+  padding-right:calc(18px + env(safe-area-inset-right));
   color:#EAF3F1;
   border-bottom:4px solid var(--lane);
 }
@@ -124,6 +133,20 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
   font:600 16px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:4px;
 }
 .go:disabled{background:var(--tile-2);color:#93A5AB;cursor:not-allowed}
+
+/* The sleep row, both action buttons and the coach flag rows had no focus
+   style and fell back to the UA's thin black ring, which is invisible on
+   the navy .go button. Gold matches the lane-line language; the dark halo
+   carries the contrast on the light tile background, where gold alone is
+   only about 1.9:1. */
+.sleep button:focus-visible,
+.go:focus-visible,
+.ghost:focus-visible,
+.flagrow:focus-visible{
+  outline:2px solid var(--lane);
+  outline-offset:2px;
+  box-shadow:0 0 0 4px rgba(10,42,51,.6);
+}
 .ghost{
   width:100%;padding:13px;background:transparent;border:1px solid var(--water);
   color:var(--water);font:600 15px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:8px;
