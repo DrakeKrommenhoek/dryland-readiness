@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dryland Readiness — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tile:#E7EDEA;
+  --tile-2:#DBE4E0;
+  --water:#0E4A5B;
+  --water-2:#12657A;
+  --ink:#0A2A33;
+  --ink-soft:#4A6670;
+  --lane:#E0A32B;
+  --flag:#B8402C;
+  --ok:#2E7D62;
+  --line:rgba(10,42,51,.14);
+  --radius:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--tile);
+  color:var(--ink);
+  font:400 16px/1.55 "Public Sans",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:460px;margin:0 auto;padding:0 18px 64px}
+
+/* header: timing-console strip */
+.top{
+  background:var(--water);
+  margin:0 -18px 22px;
+  padding:16px 18px 0;
+  color:#EAF3F1;
+  border-bottom:4px solid var(--lane);
+}
+.top h1{
+  font:600 27px/1 "Barlow Condensed",sans-serif;
+  letter-spacing:.02em;margin:0 0 2px;
+}
+.top p{margin:0 0 14px;font-size:13px;color:#9FC2C6}
+.roles{display:flex;gap:0}
+.roles button{
+  flex:1;background:transparent;border:0;border-bottom:3px solid transparent;
+  color:#9FC2C6;font:600 14px/1 "Public Sans",sans-serif;
+  padding:11px 0 10px;cursor:pointer;
+}
+.roles button[aria-selected="true"]{color:#fff;border-bottom-color:var(--lane)}
+.roles button:focus-visible{outline:2px solid var(--lane);outline-offset:-2px}
+
+h2{font:600 21px/1.2 "Barlow Condensed",sans-serif;margin:0 0 4px;letter-spacing:.01em}
+.sub{margin:0 0 18px;color:var(--ink-soft);font-size:14px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+
+/* lane-line readiness selector */
+.q{font-weight:600;font-size:15px;margin:0 0 3px}
+.hint{color:var(--ink-soft);font-size:13px;margin:0 0 12px}
+.lanes{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.lanes button{
+  aspect-ratio:1/1.5;border:1px solid var(--line);background:var(--tile-2);
+  border-radius:2px;cursor:pointer;color:var(--ink-soft);
+  font:600 14px/1 "Barlow Condensed",sans-serif;padding:0;
+}
+.lanes button[aria-pressed="true"]{background:var(--water);border-color:var(--water);color:#fff}
+.lanes button:focus-visible{outline:2px solid var(--lane);outline-offset:1px}
+.scale{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:12px;margin-top:6px}
+
+.sleep{display:flex;gap:6px}
+.sleep button{
+  flex:1;padding:10px 0;border:1px solid var(--line);background:var(--tile-2);
+  border-radius:2px;font:500 14px/1 "Public Sans",sans-serif;color:var(--ink-soft);cursor:pointer;
+}
+.sleep button[aria-pressed="true"]{background:var(--water);border-color:var(--water);color:#fff}
+
+textarea{
+  width:100%;border:1px solid var(--line);border-radius:2px;padding:10px;
+  font:400 15px/1.4 "Public Sans",sans-serif;resize:vertical;min-height:64px;background:var(--tile-2);color:var(--ink)
+}
+textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#fff}
+
+.go{
+  width:100%;padding:15px;border:0;background:var(--water);color:#fff;
+  font:600 16px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:4px;
+}
+.go:disabled{background:var(--tile-2);color:#93A5AB;cursor:not-allowed}
+.ghost{
+  width:100%;padding:13px;background:transparent;border:1px solid var(--water);
+  color:var(--water);font:600 15px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:8px;
+}
+
+/* result */
+.banner{border-left:4px solid var(--lane);background:#fff;border:1px solid var(--line);border-left-width:4px;padding:14px 16px;margin-bottom:14px}
+.banner.low{border-left-color:var(--flag)}
+.banner.full{border-left-color:var(--ok)}
+.banner strong{display:block;font:600 19px/1.15 "Barlow Condensed",sans-serif;margin-bottom:3px}
+.banner p{margin:0;font-size:14px;color:var(--ink-soft)}
+.banner a{color:var(--water-2)}
+
+.lift{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+.lift:last-child{border-bottom:0}
+.lift .nm{font-weight:600;font-size:15px}
+.lift .rs{font-size:13px;color:var(--ink-soft)}
+.load{font:600 22px/1 "Barlow Condensed",sans-serif;text-align:right;white-space:nowrap}
+.load .was{font-size:14px;color:var(--ink-soft);text-decoration:line-through;margin-right:7px;font-weight:500}
+.load .now{color:var(--water)}
+.load .now.cut{color:var(--lane)}
+
+.reveal{animation:rise .34s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal{animation:none}}
+
+/* coach */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:16px}
+.stat{background:#fff;padding:13px 12px}
+.stat b{display:block;font:600 27px/1 "Barlow Condensed",sans-serif}
+.stat span{font-size:12px;color:var(--ink-soft)}
+.flagrow{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.flagrow:last-child{border-bottom:0}
+.tick{width:4px;align-self:stretch;background:var(--flag);flex:0 0 4px}
+.tick.warn{background:var(--lane)}
+.flagrow .nm{font-weight:600;font-size:15px;margin:0}
+.flagrow .why{margin:2px 0 0;font-size:13px;color:var(--ink-soft)}
+.note{font-size:13px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+
+.foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Dryland Readiness</h1>
+    <p>Prototype. Sample data, no real athletes.</p>
+    <div class="roles" role="tablist">
+      <button id="tabA" role="tab" aria-selected="true" onclick="setRole('athlete')">Athlete</button>
+      <button id="tabC" role="tab" aria-selected="false" onclick="setRole('coach')">Coach</button>
+    </div>
+  </header>
+
+  <!-- ATHLETE: CHECK-IN -->
+  <section id="checkin">
+    <h2>Tuesday lift, 3:30pm</h2>
+    <p class="sub">Three questions. Your workout loads adjust before you get to the weight room.</p>
+
+    <div class="card">
+      <p class="q">How ready do you feel today?</p>
+      <p class="hint">10 is fresh and ready to push. 1 is running on empty.</p>
+      <div class="lanes" id="lanes"></div>
+      <div class="scale"><span>Empty</span><span>Fresh</span></div>
+    </div>
+
+    <div class="card">
+      <p class="q">How did you sleep?</p>
+      <div class="sleep" id="sleep"></div>
+    </div>
+
+    <div class="card">
+      <p class="q">Anything the staff should know?</p>
+      <p class="hint">Optional. Soreness, illness, a rough week.</p>
+      <textarea id="note" placeholder="Right shoulder is tight from Sunday"></textarea>
+    </div>
+
+    <button class="go" id="submit" disabled onclick="submit()">Get today's workout</button>
+  </section>
+
+  <!-- ATHLETE: WORKOUT -->
+  <section id="workout" class="hide"></section>
+
+  <!-- COACH -->
+  <section id="coach" class="hide">
+    <h2>Tuesday, dryland group A</h2>
+    <p class="sub">You see flags and team trends. Individual daily scores stay between the athlete and the training staff.</p>
+
+    <div class="stats">
+      <div class="stat"><b>24</b><span>of 26 checked in</span></div>
+      <div class="stat"><b>92%</b><span>compliance, 7 days</span></div>
+      <div class="stat"><b>3</b><span>flagged today</span></div>
+    </div>
+
+    <div class="card">
+      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer. You would see the 14-day trend, the athlete note, and a button to override today\'s load.')">
+        <div class="tick"></div>
+        <div><p class="nm">Athlete 07</p><p class="why">Reported 3 or below. Trainer notified 11:42am.</p></div>
+      </div>
+      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer.')">
+        <div class="tick warn"></div>
+        <div><p class="nm">Athlete 12</p><p class="why">Third reading of 5 or below in 7 days.</p></div>
+      </div>
+      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer.')">
+        <div class="tick warn"></div>
+        <div><p class="nm">Athlete 19</p><p class="why">2.4 points below their own 14-day average.</p></div>
+      </div>
+      <p class="note">You can override any automatic load change. The override is logged so the pattern stays readable later.</p>
+    </div>
+
+    <div class="card">
+      <p class="q">Team trend, last 10 sessions</p>
+      <p class="hint">Average readiness 7.4, down from 8.1 two weeks ago. Six athletes reduced load on Monday.</p>
+    </div>
+  </section>
+
+  <p class="foot">Prototype for discussion. Load percentages, flag rules, and visibility settings are all adjustable. Nothing here is medical advice.</p>
+</div>
+
+<script>
+var readiness = null, sleep = null;
+
+var lanes = document.getElementById('lanes');
+for (var i = 1; i <= 10; i++) {
+  var b = document.createElement('button');
+  b.textContent = i;
+  b.setAttribute('aria-pressed', 'false');
+  b.setAttribute('aria-label', 'Readiness ' + i);
+  b.dataset.v = i;
+  b.onclick = function () { pick('readiness', this); };
+  lanes.appendChild(b);
+}
+
+var sleepWrap = document.getElementById('sleep');
+['Poor', 'Okay', 'Good', 'Great'].forEach(function (label, idx) {
+  var b = document.createElement('button');
+  b.textContent = label;
+  b.setAttribute('aria-pressed', 'false');
+  b.dataset.v = idx + 1;
+  b.onclick = function () { pick('sleep', this); };
+  sleepWrap.appendChild(b);
+});
+
+function pick(field, el) {
+  var siblings = el.parentNode.children;
+  for (var i = 0; i < siblings.length; i++) siblings[i].setAttribute('aria-pressed', 'false');
+  el.setAttribute('aria-pressed', 'true');
+  if (field === 'readiness') readiness = Number(el.dataset.v); else sleep = Number(el.dataset.v);
+  document.getElementById('submit').disabled = (readiness === null || sleep === null);
+}
+
+function band(r) {
+  if (r >= 8) return { f: 1.00, cls: 'full', title: 'Full session as programmed', copy: 'You are on the plan the coaching staff wrote for today. Nothing reduced.' };
+  if (r >= 6) return { f: 0.90, cls: '', title: 'Loads trimmed to 90%', copy: 'Same movements, slightly lighter. Volume is unchanged.' };
+  if (r >= 4) return { f: 0.78, cls: '', title: 'Loads trimmed to 78%', copy: 'A deliberate lighter day. This is logged, not held against you.' };
+  return { f: 0.65, cls: 'low', title: 'Loads trimmed to 65%', copy: 'The athletic trainer has been notified that you reported low today. They will reach out. You can also stop by the training room before the session.' };
+}
+
+var lifts = [
+  { nm: 'Trap bar deadlift', rs: '4 x 5', load: 225 },
+  { nm: 'Incline press', rs: '4 x 6', load: 135 },
+  { nm: 'Single-leg RDL', rs: '3 x 8 each', load: 60 },
+  { nm: 'Weighted pull-up', rs: '3 x 5', load: 35 }
+];
+
+function submit() {
+  var b = band(readiness);
+  var rows = lifts.map(function (l) {
+    var adj = Math.round(l.load * b.f / 5) * 5;
+    var was = b.f < 1 ? '<span class="was">' + l.load + '</span>' : '';
+    var cls = b.f < 1 ? 'now cut' : 'now';
+    return '<div class="lift"><div><div class="nm">' + l.nm + '</div><div class="rs">' + l.rs + '</div></div>' +
+           '<div class="load">' + was + '<span class="' + cls + '">' + adj + ' lb</span></div></div>';
+  }).join('');
+
+  document.getElementById('checkin').classList.add('hide');
+  var w = document.getElementById('workout');
+  w.className = 'reveal';
+  w.innerHTML =
+    '<h2>Tuesday lift, 3:30pm</h2>' +
+    '<p class="sub">Readiness ' + readiness + ' of 10.</p>' +
+    '<div class="banner ' + b.cls + '"><strong>' + b.title + '</strong><p>' + b.copy + '</p></div>' +
+    '<div class="card">' + rows + '</div>' +
+    '<button class="go" onclick="alert(\'Session logged. Your streak counts check-ins, not workouts, so a lighter day never breaks it.\')">Mark session complete</button>' +
+    '<button class="ghost" onclick="reset()">Try another readiness score</button>';
+}
+
+function reset() {
+  readiness = null; sleep = null;
+  document.getElementById('submit').disabled = true;
+  var all = document.querySelectorAll('#lanes button, #sleep button');
+  for (var i = 0; i < all.length; i++) all[i].setAttribute('aria-pressed', 'false');
+  document.getElementById('note').value = '';
+  document.getElementById('workout').className = 'hide';
+  document.getElementById('checkin').classList.remove('hide');
+  window.scrollTo(0, 0);
+}
+
+function setRole(r) {
+  var athlete = r === 'athlete';
+  document.getElementById('tabA').setAttribute('aria-selected', athlete);
+  document.getElementById('tabC').setAttribute('aria-selected', !athlete);
+  document.getElementById('coach').className = athlete ? 'hide' : 'reveal';
+  if (athlete) { reset(); } else {
+    document.getElementById('checkin').classList.add('hide');
+    document.getElementById('workout').className = 'hide';
+  }
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
