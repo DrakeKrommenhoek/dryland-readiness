@@ -204,7 +204,7 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
 
   <!-- ATHLETE: CHECK-IN -->
   <section id="checkin">
-    <h2>Tuesday lift, 3:30pm</h2>
+    <h2 tabindex="-1">Tuesday lift, 3:30pm</h2>
     <p class="sub">Three questions. Your workout loads adjust before you get to the weight room.</p>
 
     <div class="card">
@@ -233,7 +233,7 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
 
   <!-- COACH -->
   <section id="coach" class="hide">
-    <h2>Tuesday, dryland group A</h2>
+    <h2 tabindex="-1">Tuesday, dryland group A</h2>
     <p class="sub">You see flags and team trends. Individual daily scores stay between the athlete and the training staff.</p>
 
     <div class="stats">
@@ -243,15 +243,15 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
     </div>
 
     <div class="card">
-      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer. You would see the 14-day trend, the athlete note, and a button to override today\'s load.')">
+      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer. You would see the 14-day trend, the athlete note, and a button to override today\'s load.')">
         <div class="tick"></div>
         <div><p class="nm">Athlete 07</p><p class="why">Reported 3 or below. Trainer notified 11:42am.</p></div>
       </div>
-      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer.')">
+      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer.')">
         <div class="tick warn"></div>
         <div><p class="nm">Athlete 12</p><p class="why">Third reading of 5 or below in 7 days.</p></div>
       </div>
-      <div class="flagrow" onclick="alert('Full detail opens for the athletic trainer.')">
+      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer.')">
         <div class="tick warn"></div>
         <div><p class="nm">Athlete 19</p><p class="why">2.4 points below their own 14-day average.</p></div>
       </div>
@@ -291,6 +291,25 @@ var sleepWrap = document.getElementById('sleep');
   sleepWrap.appendChild(b);
 });
 
+// The flag rows are divs, so Enter/Space need wiring by hand the way a
+// real button would get them for free.
+var flagrows = document.querySelectorAll('.flagrow');
+for (var f = 0; f < flagrows.length; f++) {
+  flagrows[f].onkeydown = function (e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      this.click();
+    }
+  };
+}
+
+// Move focus to the heading of whatever screen just appeared, so keyboard
+// and screen reader users land on the new content instead of the top of
+// the document. preventScroll keeps the existing scroll-to-top behaviour.
+function focusHeading(el) {
+  if (el) { el.focus({ preventScroll: true }); }
+}
+
 function pick(field, el) {
   var siblings = el.parentNode.children;
   for (var i = 0; i < siblings.length; i++) siblings[i].setAttribute('aria-pressed', 'false');
@@ -327,12 +346,15 @@ function submit() {
   var w = document.getElementById('workout');
   w.className = 'reveal';
   w.innerHTML =
-    '<h2>Tuesday lift, 3:30pm</h2>' +
+    '<h2 tabindex="-1">Tuesday lift, 3:30pm</h2>' +
     '<p class="sub">Readiness ' + readiness + ' of 10.</p>' +
     '<div class="banner ' + b.cls + '"><strong>' + b.title + '</strong><p>' + b.copy + '</p></div>' +
     '<div class="card">' + rows + '</div>' +
     '<button class="go" onclick="alert(\'Session logged. Your streak counts check-ins, not workouts, so a lighter day never breaks it.\')">Mark session complete</button>' +
     '<button class="ghost" onclick="reset()">Try another readiness score</button>';
+
+  focusHeading(w.querySelector('h2'));
+  window.scrollTo(0, 0);
 }
 
 function reset() {
@@ -343,6 +365,7 @@ function reset() {
   document.getElementById('note').value = '';
   document.getElementById('workout').className = 'hide';
   document.getElementById('checkin').classList.remove('hide');
+  focusHeading(document.querySelector('#checkin h2'));
   window.scrollTo(0, 0);
 }
 
@@ -354,6 +377,7 @@ function setRole(r) {
   if (athlete) { reset(); } else {
     document.getElementById('checkin').classList.add('hide');
     document.getElementById('workout').className = 'hide';
+    focusHeading(document.querySelector('#coach h2'));
   }
   window.scrollTo(0, 0);
 }
