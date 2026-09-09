@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dryland Readiness — Demo</title>
-<meta name="description" content="A dryland readiness check-in prototype for a college swim team. Athletes report readiness before a lift and loads adjust automatically. Sample data, no real athletes.">
+<title>Readiness — Demo</title>
+<meta name="description" content="A readiness check-in prototype for a college varsity swim team. Sample data, no real athletes.">
 
 <!-- Unreleased prototype: keep it out of search. -->
 <meta name="robots" content="noindex">
 <meta name="googlebot" content="noindex">
 
-<!-- Chrome/Android UI + iOS home screen -->
-<meta name="theme-color" content="#0E4A5B">
+<meta name="theme-color" content="#003399">
 <meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -24,169 +23,227 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- Link preview for email and text -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Dryland Readiness">
-<meta property="og:title" content="Dryland Readiness">
-<meta property="og:description" content="A readiness check-in prototype for a college swim team. Sample data, no real athletes.">
+<meta property="og:site_name" content="Readiness">
+<meta property="og:title" content="Readiness">
+<meta property="og:description" content="A readiness check-in prototype for a college varsity swim team. Sample data, no real athletes.">
 <meta property="og:image" content="/og-image.png">
-<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Dryland Readiness, a prototype using sample data and no real athletes.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Dryland Readiness">
-<meta name="twitter:description" content="A readiness check-in prototype for a college swim team. Sample data, no real athletes.">
+<meta name="twitter:title" content="Readiness">
+<meta name="twitter:description" content="A readiness check-in prototype for a college varsity swim team. Sample data, no real athletes.">
 <meta name="twitter:image" content="/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Washington and Lee athletics royal blue, PMS 293 C.
+   Verify against the official brand guide before this goes past the coach:
+   my.wlu.edu/communications-and-public-affairs/washington-and-lee-university-brand-guide */
 :root{
-  --tile:#E7EDEA;
-  --tile-2:#DBE4E0;
-  --water:#0E4A5B;
-  --water-2:#12657A;
-  --ink:#0A2A33;
-  --ink-soft:#4A6670;
-  --lane:#E0A32B;
-  --flag:#B8402C;
-  --ok:#2E7D62;
-  --line:rgba(10,42,51,.14);
-  --radius:3px;
+  --blue:#003399;
+  --blue-deep:#002271;
+  --blue-tint:#EAEFFA;
+  --blue-line:#C7D3F0;
+  --ink:#0B1220;
+  --ink-soft:#59637A;
+  --paper:#fff;
+  --bg:#F5F7FC;
+  --line:#E2E7F2;
+  --severe:#B3261E;
+  --warn:#9A5B00;
+  --ok:#12684A;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(11,18,32,.06), 0 4px 16px rgba(11,18,32,.05);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:var(--tile);
+  background:var(--bg);
   color:var(--ink);
-  font:400 16px/1.55 "Public Sans",system-ui,sans-serif;
+  font:400 16px/1.55 "Public Sans",system-ui,-apple-system,sans-serif;
   -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
 }
 .wrap{
-  max-width:460px;margin:0 auto;padding:0 18px 64px;
-  /* iOS notch/home indicator. Every inset resolves to 0 elsewhere, so
-     these collapse back to the values above off-iOS. */
+  max-width:460px;margin:0 auto;padding:0 18px 72px;
   padding-left:calc(18px + env(safe-area-inset-left));
   padding-right:calc(18px + env(safe-area-inset-right));
-  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
 }
 
-/* header: timing-console strip */
+/* ---------- header ---------- */
 .top{
-  background:var(--water);
-  margin:0 calc(-18px - env(safe-area-inset-right)) 22px calc(-18px - env(safe-area-inset-left));
-  padding:calc(16px + env(safe-area-inset-top)) 18px 0;
+  background:var(--blue);
+  margin:0 calc(-18px - env(safe-area-inset-right)) 20px calc(-18px - env(safe-area-inset-left));
+  padding:calc(14px + env(safe-area-inset-top)) 18px 0;
   padding-left:calc(18px + env(safe-area-inset-left));
   padding-right:calc(18px + env(safe-area-inset-right));
-  color:#EAF3F1;
-  border-bottom:4px solid var(--lane);
+  color:#fff;
 }
-.top h1{
-  font:600 27px/1 "Barlow Condensed",sans-serif;
-  letter-spacing:.02em;margin:0 0 2px;
+.brand{display:flex;align-items:center;gap:11px}
+/* LOGO SLOT. Replace this block with the official W&L Generals athletics mark
+   (SVG or PNG at 2x, ~34px tall). Using the official mark on anything athletes
+   see needs a nod from athletics communications - see the ownership email. */
+.crest{
+  width:34px;height:34px;flex:0 0 34px;border-radius:7px;
+  background:#fff;display:grid;place-items:center;
 }
-.top p{margin:0 0 14px;font-size:13px;color:#9FC2C6}
-.roles{display:flex;gap:0}
+.crest svg{display:block}
+.brand h1{
+  font:700 25px/1 "Barlow Condensed",sans-serif;
+  letter-spacing:.035em;text-transform:uppercase;margin:0;
+}
+.brand p{margin:2px 0 0;font-size:12px;color:#B9C9EE;letter-spacing:.01em}
+.roles{display:flex;gap:0;margin-top:14px}
 .roles button{
   flex:1;background:transparent;border:0;border-bottom:3px solid transparent;
-  color:#9FC2C6;font:600 14px/1 "Public Sans",sans-serif;
-  padding:11px 0 10px;cursor:pointer;
+  color:#B9C9EE;font:600 13px/1 "Public Sans",sans-serif;letter-spacing:.02em;
+  padding:12px 0 11px;cursor:pointer;
 }
-.roles button[aria-selected="true"]{color:#fff;border-bottom-color:var(--lane)}
-.roles button:focus-visible{outline:2px solid var(--lane);outline-offset:-2px}
+.roles button[aria-selected="true"]{color:#fff;border-bottom-color:#fff}
+.roles button:focus-visible{outline:2px solid #fff;outline-offset:-3px;border-radius:3px}
 
-h2{font:600 21px/1.2 "Barlow Condensed",sans-serif;margin:0 0 4px;letter-spacing:.01em}
+/* ---------- type ---------- */
+h2{font:600 24px/1.15 "Barlow Condensed",sans-serif;margin:0 0 3px;letter-spacing:.01em}
 .sub{margin:0 0 18px;color:var(--ink-soft);font-size:14px}
+.eyebrow{
+  font:600 11px/1 "Public Sans",sans-serif;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--blue);margin:0 0 7px;
+}
 
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
-
-/* lane-line readiness selector */
+.card{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:17px;margin-bottom:13px;box-shadow:var(--shadow);
+}
 .q{font-weight:600;font-size:15px;margin:0 0 3px}
-.hint{color:var(--ink-soft);font-size:13px;margin:0 0 12px}
-.lanes{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
-.lanes button{
-  aspect-ratio:1/1.5;border:1px solid var(--line);background:var(--tile-2);
-  border-radius:2px;cursor:pointer;color:var(--ink-soft);
-  font:600 14px/1 "Barlow Condensed",sans-serif;padding:0;
-}
-.lanes button[aria-pressed="true"]{background:var(--water);border-color:var(--water);color:#fff}
-.lanes button:focus-visible{outline:2px solid var(--lane);outline-offset:1px}
-.scale{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:12px;margin-top:6px}
+.hint{color:var(--ink-soft);font-size:13px;margin:0 0 14px}
 
-.sleep{display:flex;gap:6px}
-.sleep button{
-  flex:1;padding:10px 0;border:1px solid var(--line);background:var(--tile-2);
-  border-radius:2px;font:500 14px/1 "Public Sans",sans-serif;color:var(--ink-soft);cursor:pointer;
+/* ---------- readiness selector ----------
+   Five across, two rows. The previous build ran ten across, which measured
+   26x40px at 360px wide - under the 44px minimum touch target. */
+.lanes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lanes button{
+  aspect-ratio:1/.92;border:1.5px solid var(--line);background:var(--paper);
+  border-radius:10px;cursor:pointer;color:var(--ink);
+  font:600 19px/1 "Public Sans",sans-serif;padding:0;
+  font-variant-numeric:tabular-nums;
+  transition:background .12s ease, border-color .12s ease, color .12s ease;
 }
-.sleep button[aria-pressed="true"]{background:var(--water);border-color:var(--water);color:#fff}
+.lanes button:hover{border-color:var(--blue-line);background:var(--blue-tint)}
+.lanes button[aria-pressed="true"]{
+  background:var(--blue);border-color:var(--blue);color:#fff;
+}
+.scale{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:12px;margin-top:10px}
+
+.sleep{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sleep button{
+  /* min-height, not padding: measured 42px at 360px wide, under the 44px
+     minimum touch target. */
+  padding:13px 0;min-height:46px;border:1.5px solid var(--line);background:var(--paper);
+  border-radius:10px;font:500 14px/1 "Public Sans",sans-serif;color:var(--ink);cursor:pointer;
+  transition:background .12s ease, border-color .12s ease, color .12s ease;
+}
+.sleep button:hover{border-color:var(--blue-line);background:var(--blue-tint)}
+.sleep button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 
 textarea{
-  width:100%;border:1px solid var(--line);border-radius:2px;padding:10px;
-  font:400 15px/1.4 "Public Sans",sans-serif;resize:vertical;min-height:64px;background:var(--tile-2);color:var(--ink)
+  width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px;
+  font:400 15px/1.45 "Public Sans",sans-serif;resize:vertical;min-height:70px;
+  background:var(--paper);color:var(--ink);
 }
-textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#fff}
+textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 
+/* ---------- buttons ---------- */
 .go{
-  width:100%;padding:15px;border:0;background:var(--water);color:#fff;
-  font:600 16px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:4px;
+  width:100%;padding:16px;border:0;background:var(--blue);color:#fff;
+  font:600 16px/1 "Public Sans",sans-serif;border-radius:10px;cursor:pointer;margin-top:6px;
+  letter-spacing:.01em;
 }
-.go:disabled{background:var(--tile-2);color:#93A5AB;cursor:not-allowed}
+.go:hover:not(:disabled){background:var(--blue-deep)}
+.go:disabled{background:#DFE4F0;color:#98A0B4;cursor:not-allowed}
+.ghost{
+  width:100%;padding:14px;background:transparent;border:1.5px solid var(--blue-line);
+  color:var(--blue);font:600 15px/1 "Public Sans",sans-serif;border-radius:10px;
+  cursor:pointer;margin-top:9px;
+}
+.ghost:hover{background:var(--blue-tint)}
 
-/* The sleep row, both action buttons and the coach flag rows had no focus
-   style and fell back to the UA's thin black ring, which is invisible on
-   the navy .go button. Gold matches the lane-line language; the dark halo
-   carries the contrast on the light tile background, where gold alone is
-   only about 1.9:1. */
+/* One focus treatment for everything. Blue on the light ground clears 3:1
+   comfortably; the halo carries it on the blue header and blue buttons. */
+.lanes button:focus-visible,
 .sleep button:focus-visible,
 .go:focus-visible,
 .ghost:focus-visible,
 .flagrow:focus-visible{
-  outline:2px solid var(--lane);
+  outline:2.5px solid var(--blue);
   outline-offset:2px;
-  box-shadow:0 0 0 4px rgba(10,42,51,.6);
-}
-.ghost{
-  width:100%;padding:13px;background:transparent;border:1px solid var(--water);
-  color:var(--water);font:600 15px/1 "Public Sans",sans-serif;border-radius:2px;cursor:pointer;margin-top:8px;
+  box-shadow:0 0 0 5px rgba(0,51,153,.22);
 }
 
-/* result */
-.banner{border-left:4px solid var(--lane);background:#fff;border:1px solid var(--line);border-left-width:4px;padding:14px 16px;margin-bottom:14px}
-.banner.low{border-left-color:var(--flag)}
+/* ---------- workout ---------- */
+.banner{
+  background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--blue);
+  border-radius:var(--radius);padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow);
+}
+.banner.low{border-left-color:var(--severe)}
 .banner.full{border-left-color:var(--ok)}
-.banner strong{display:block;font:600 19px/1.15 "Barlow Condensed",sans-serif;margin-bottom:3px}
+.banner strong{display:block;font:600 19px/1.15 "Barlow Condensed",sans-serif;margin-bottom:4px;letter-spacing:.01em}
 .banner p{margin:0;font-size:14px;color:var(--ink-soft)}
-.banner a{color:var(--water-2)}
 
-.lift{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+.lift{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
 .lift:last-child{border-bottom:0}
 .lift .nm{font-weight:600;font-size:15px}
-.lift .rs{font-size:13px;color:var(--ink-soft)}
-.load{font:600 22px/1 "Barlow Condensed",sans-serif;text-align:right;white-space:nowrap}
-.load .was{font-size:14px;color:var(--ink-soft);text-decoration:line-through;margin-right:7px;font-weight:500}
-.load .now{color:var(--water)}
-.load .now.cut{color:var(--lane)}
+.lift .rs{font-size:13px;color:var(--ink-soft);margin-top:1px}
+.load{font:700 21px/1 "Public Sans",sans-serif;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.load .was{font-size:13px;color:var(--ink-soft);text-decoration:line-through;margin-right:8px;font-weight:500}
+.load .now{color:var(--blue)}
+.load .now.cut{color:var(--warn)}
 
-.reveal{animation:rise .34s ease-out both}
-@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.reveal{animation:none}}
+.reveal{animation:rise .28s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .reveal{animation:none}
+  *{transition:none !important}
+}
 
-/* coach */
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:16px}
-.stat{background:#fff;padding:13px 12px}
-.stat b{display:block;font:600 27px/1 "Barlow Condensed",sans-serif}
-.stat span{font-size:12px;color:var(--ink-soft)}
-.flagrow{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
-.flagrow:last-child{border-bottom:0}
-.tick{width:4px;align-self:stretch;background:var(--flag);flex:0 0 4px}
-.tick.warn{background:var(--lane)}
-.flagrow .nm{font-weight:600;font-size:15px;margin:0}
-.flagrow .why{margin:2px 0 0;font-size:13px;color:var(--ink-soft)}
-.note{font-size:13px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+/* ---------- staff ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.stat{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:13px 12px;box-shadow:var(--shadow);
+}
+.stat b{display:block;font:700 25px/1 "Public Sans",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat span{font-size:11.5px;color:var(--ink-soft);display:block;margin-top:3px;line-height:1.3}
 
-.foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
+.flagrow{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+  padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;
+  background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;
+}
+.flagrow:last-of-type{border-bottom:0}
+.tick{width:4px;align-self:stretch;background:var(--severe);flex:0 0 4px;border-radius:2px}
+.tick.warn{background:var(--warn)}
+.flagrow .body{flex:1;min-width:0}
+.flagrow .nm{font-weight:600;font-size:15px;margin:0;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+/* These are spans inside a <button>, so they need display:block explicitly.
+   Without it the line breaks are whatever the text happens to wrap to. */
+.flagrow .why{display:block;margin:3px 0 0;font-size:13px;color:var(--ink-soft)}
+.count{
+  font:600 11px/1 "Public Sans",sans-serif;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--severe);background:#FBEAE8;border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;
+}
+.count.warn{color:var(--warn);background:#FBF0DE}
+.when{display:block;font-size:12px;color:var(--ink-soft);margin-top:5px;font-variant-numeric:tabular-nums}
+.note{
+  font-size:13px;color:var(--ink-soft);border-top:1px solid var(--line);
+  padding-top:13px;margin-top:14px;
+}
+.empty{color:var(--ink-soft);font-size:14px;padding:6px 0 2px;margin:0}
+
+.foot{margin-top:28px;padding-top:15px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
 .hide{display:none}
 </style>
 </head>
@@ -194,18 +251,32 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
 <div class="wrap">
 
   <header class="top">
-    <h1>Dryland Readiness</h1>
-    <p>Prototype. Sample data, no real athletes.</p>
-    <div class="roles" role="tablist">
+    <div class="brand">
+      <!-- LOGO SLOT: swap for the official W&L Generals athletics mark. -->
+      <span class="crest" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="1" y="11" width="4.6" height="8" rx="1.4" fill="#7F95C7"/>
+          <rect x="7.7" y="6" width="4.6" height="13" rx="1.4" fill="#3D62B0"/>
+          <rect x="14.4" y="1" width="4.6" height="18" rx="1.4" fill="#003399"/>
+        </svg>
+      </span>
+      <div>
+        <h1>Readiness</h1>
+        <p>Prototype. Sample data, no real athletes.</p>
+      </div>
+    </div>
+    <div class="roles" role="tablist" aria-label="Preview as">
       <button id="tabA" role="tab" aria-selected="true" onclick="setRole('athlete')">Athlete</button>
       <button id="tabC" role="tab" aria-selected="false" onclick="setRole('coach')">Coach</button>
+      <button id="tabT" role="tab" aria-selected="false" onclick="setRole('trainer')">Trainer</button>
     </div>
   </header>
 
   <!-- ATHLETE: CHECK-IN -->
   <section id="checkin">
-    <h2 tabindex="-1">Tuesday lift, 3:30pm</h2>
-    <p class="sub">Three questions. Your workout loads adjust before you get to the weight room.</p>
+    <p class="eyebrow">Tuesday · 3:30pm</p>
+    <h2 tabindex="-1">Weight room</h2>
+    <p class="sub">Three questions. Your loads adjust before you get there.</p>
 
     <div class="card">
       <p class="q">How ready do you feel today?</p>
@@ -233,34 +304,76 @@ textarea:focus{outline:2px solid var(--water-2);outline-offset:-1px;background:#
 
   <!-- COACH -->
   <section id="coach" class="hide">
-    <h2 tabindex="-1">Tuesday, dryland group A</h2>
-    <p class="sub">You see flags and team trends. Individual daily scores stay between the athlete and the training staff.</p>
+    <p class="eyebrow">Tuesday · Group A</p>
+    <h2 tabindex="-1">Your flag list</h2>
+    <p class="sub">Athletes who reported low, or stopped checking in. Daily numbers stay between the athlete and the training staff.</p>
 
     <div class="stats">
       <div class="stat"><b>24</b><span>of 26 checked in</span></div>
       <div class="stat"><b>92%</b><span>compliance, 7 days</span></div>
-      <div class="stat"><b>3</b><span>flagged today</span></div>
+      <div class="stat"><b>2</b><span>on your list</span></div>
     </div>
 
     <div class="card">
-      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer. You would see the 14-day trend, the athlete note, and a button to override today\'s load.')">
-        <div class="tick"></div>
-        <div><p class="nm">Athlete 07</p><p class="why">Reported 3 or below. Trainer notified 11:42am.</p></div>
-      </div>
-      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer.')">
-        <div class="tick warn"></div>
-        <div><p class="nm">Athlete 12</p><p class="why">Third reading of 5 or below in 7 days.</p></div>
-      </div>
-      <div class="flagrow" role="button" tabindex="0" onclick="alert('Full detail opens for the athletic trainer.')">
-        <div class="tick warn"></div>
-        <div><p class="nm">Athlete 19</p><p class="why">2.4 points below their own 14-day average.</p></div>
-      </div>
-      <p class="note">You can override any automatic load change. The override is logged so the pattern stays readable later.</p>
+      <button class="flagrow" onclick="detail('coach')">
+        <span class="tick"></span>
+        <span class="body">
+          <span class="nm">Athlete 07 <span class="count">3rd time</span></span>
+          <span class="why">Reported 3 or below. Trainer notified 11:42am.</span>
+          <span class="when">Today · Sep 2 · Aug 28</span>
+        </span>
+      </button>
+      <button class="flagrow" onclick="detail('coach')">
+        <span class="tick warn"></span>
+        <span class="body">
+          <span class="nm">Athlete 19 <span class="count warn">4 days</span></span>
+          <span class="why">No check-in for 4 straight lifting days.</span>
+          <span class="when">Last check-in Sep 1</span>
+        </span>
+      </button>
+      <p class="note">You can override any automatic load change. Overrides are logged so the pattern stays readable later.</p>
     </div>
 
     <div class="card">
       <p class="q">Team trend, last 10 sessions</p>
-      <p class="hint">Average readiness 7.4, down from 8.1 two weeks ago. Six athletes reduced load on Monday.</p>
+      <p class="hint" style="margin:0">Average readiness 7.4, down from 8.1 two weeks ago. Six athletes reduced load on Monday.</p>
+    </div>
+
+    <p class="foot" style="margin-top:16px;border:0;padding:0">The athletic trainer sees more than this list, including trend-based flags for athletes drifting below their own normal. Those do not reach you.</p>
+  </section>
+
+  <!-- TRAINER -->
+  <section id="trainer" class="hide">
+    <p class="eyebrow">Tuesday · Group A</p>
+    <h2 tabindex="-1">Flagged athletes</h2>
+    <p class="sub">Full detail on flagged athletes only, while the flag is open. The same two the coach sees, plus one he does not.</p>
+
+    <div class="card">
+      <button class="flagrow" onclick="detail('trainer')">
+        <span class="tick"></span>
+        <span class="body">
+          <span class="nm">Athlete 07 <span class="count">3rd time</span></span>
+          <span class="why">Readiness 2. Own 14-day average 6.8.</span>
+          <span class="when">Today · Sep 2 · Aug 28 · note left today</span>
+        </span>
+      </button>
+      <button class="flagrow" onclick="detail('trainer')">
+        <span class="tick warn"></span>
+        <span class="body">
+          <span class="nm">Athlete 19 <span class="count warn">4 days</span></span>
+          <span class="why">No check-in for 4 straight lifting days.</span>
+          <span class="when">Last check-in Sep 1</span>
+        </span>
+      </button>
+      <button class="flagrow" onclick="detail('trainer')">
+        <span class="tick warn"></span>
+        <span class="body">
+          <span class="nm">Athlete 12 <span class="count warn">Trend</span></span>
+          <span class="why">Readiness 6. That is 2.4 below their own 14-day average.</span>
+          <span class="when">Coach does not see this one</span>
+        </span>
+      </button>
+      <p class="note">Athlete 12 never reported a low number. They dropped against their own normal, which is why only this view catches it.</p>
     </div>
   </section>
 
@@ -291,25 +404,6 @@ var sleepWrap = document.getElementById('sleep');
   sleepWrap.appendChild(b);
 });
 
-// The flag rows are divs, so Enter/Space need wiring by hand the way a
-// real button would get them for free.
-var flagrows = document.querySelectorAll('.flagrow');
-for (var f = 0; f < flagrows.length; f++) {
-  flagrows[f].onkeydown = function (e) {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      this.click();
-    }
-  };
-}
-
-// Move focus to the heading of whatever screen just appeared, so keyboard
-// and screen reader users land on the new content instead of the top of
-// the document. preventScroll keeps the existing scroll-to-top behaviour.
-function focusHeading(el) {
-  if (el) { el.focus({ preventScroll: true }); }
-}
-
 function pick(field, el) {
   var siblings = el.parentNode.children;
   for (var i = 0; i < siblings.length; i++) siblings[i].setAttribute('aria-pressed', 'false');
@@ -318,8 +412,18 @@ function pick(field, el) {
   document.getElementById('submit').disabled = (readiness === null || sleep === null);
 }
 
+function focusHeading(el) { if (el) { el.focus({ preventScroll: true }); } }
+
+function detail(role) {
+  if (role === 'trainer') {
+    alert('Full detail: the 14-day trend, every check-in, the athlete note, and a button to record what you did about it.');
+  } else {
+    alert('Opens the athlete, their flag history, and a button to override today\'s load. The daily numbers behind the flag stay with the training staff.');
+  }
+}
+
 function band(r) {
-  if (r >= 8) return { f: 1.00, cls: 'full', title: 'Full session as programmed', copy: 'You are on the plan the coaching staff wrote for today. Nothing reduced.' };
+  if (r >= 8) return { f: 1.00, cls: 'full', title: 'Full session as programmed', copy: 'You are on the plan the staff wrote for today. Nothing reduced.' };
   if (r >= 6) return { f: 0.90, cls: '', title: 'Loads trimmed to 90%', copy: 'Same movements, slightly lighter. Volume is unchanged.' };
   if (r >= 4) return { f: 0.78, cls: '', title: 'Loads trimmed to 78%', copy: 'A deliberate lighter day. This is logged, not held against you.' };
   return { f: 0.65, cls: 'low', title: 'Loads trimmed to 65%', copy: 'The athletic trainer has been notified that you reported low today. They will reach out. You can also stop by the training room before the session.' };
@@ -346,11 +450,12 @@ function submit() {
   var w = document.getElementById('workout');
   w.className = 'reveal';
   w.innerHTML =
-    '<h2 tabindex="-1">Tuesday lift, 3:30pm</h2>' +
+    '<p class="eyebrow">Tuesday · 3:30pm</p>' +
+    '<h2 tabindex="-1">Weight room</h2>' +
     '<p class="sub">Readiness ' + readiness + ' of 10.</p>' +
     '<div class="banner ' + b.cls + '"><strong>' + b.title + '</strong><p>' + b.copy + '</p></div>' +
     '<div class="card">' + rows + '</div>' +
-    '<button class="go" onclick="alert(\'Session logged. Your streak counts check-ins, not workouts, so a lighter day never breaks it.\')">Mark session complete</button>' +
+    '<button class="go" onclick="alert(\'Session logged.\')">Mark session complete</button>' +
     '<button class="ghost" onclick="reset()">Try another readiness score</button>';
 
   focusHeading(w.querySelector('h2'));
@@ -370,14 +475,19 @@ function reset() {
 }
 
 function setRole(r) {
-  var athlete = r === 'athlete';
-  document.getElementById('tabA').setAttribute('aria-selected', athlete);
-  document.getElementById('tabC').setAttribute('aria-selected', !athlete);
-  document.getElementById('coach').className = athlete ? 'hide' : 'reveal';
-  if (athlete) { reset(); } else {
+  var tabs = { athlete: 'tabA', coach: 'tabC', trainer: 'tabT' };
+  for (var key in tabs) {
+    document.getElementById(tabs[key]).setAttribute('aria-selected', String(key === r));
+  }
+  document.getElementById('coach').className = (r === 'coach') ? 'reveal' : 'hide';
+  document.getElementById('trainer').className = (r === 'trainer') ? 'reveal' : 'hide';
+
+  if (r === 'athlete') {
+    reset();
+  } else {
     document.getElementById('checkin').classList.add('hide');
     document.getElementById('workout').className = 'hide';
-    focusHeading(document.querySelector('#coach h2'));
+    focusHeading(document.querySelector('#' + r + ' h2'));
   }
   window.scrollTo(0, 0);
 }
