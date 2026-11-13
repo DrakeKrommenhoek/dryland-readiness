@@ -52,9 +52,11 @@
   --paper:#fff;
   --bg:#F5F7FC;
   --line:#E2E7F2;
-  --severe:#B3261E;
-  --warn:#9A5B00;
-  --ok:#12684A;
+  /* Staff flags are a blue/orange pair, never red/green, and each kind also
+     has its own shape and label so it reads without colour.
+     --miss on white is 5.3:1, on --miss-tint 4.7:1. */
+  --miss:#A85400;
+  --miss-tint:#FBEEDD;
   --radius:12px;
   --shadow:0 1px 2px rgba(11,18,32,.06), 0 4px 16px rgba(11,18,32,.05);
 }
@@ -93,21 +95,28 @@ body{
 }
 .crest svg{display:block}
 .brand h1{
-  font:700 25px/1 "Barlow Condensed",sans-serif;
+  font:700 25px/1 "Barlow Condensed","Arial Narrow",sans-serif;
   letter-spacing:.035em;text-transform:uppercase;margin:0;
 }
 .brand p{margin:2px 0 0;font-size:12px;color:#B9C9EE;letter-spacing:.01em}
-.roles{display:flex;gap:0;margin-top:14px}
+.roles{display:flex;gap:0;margin-top:14px;position:relative}
 .roles button{
-  flex:1;background:transparent;border:0;border-bottom:3px solid transparent;
+  flex:1;background:transparent;border:0;min-height:44px;
   color:#B9C9EE;font:600 13px/1 "Public Sans",sans-serif;letter-spacing:.02em;
-  padding:12px 0 11px;cursor:pointer;
+  padding:12px 0 14px;cursor:pointer;
 }
-.roles button[aria-selected="true"]{color:#fff;border-bottom-color:#fff}
+.roles button[aria-selected="true"]{color:#fff}
+/* One underline that slides between the three tabs. */
+.roles .ink{
+  position:absolute;left:0;bottom:0;width:33.3333%;height:3px;background:#fff;
+  transition:transform .2s ease-out;pointer-events:none;
+}
+.roles[data-role="coach"] .ink{transform:translateX(100%)}
+.roles[data-role="trainer"] .ink{transform:translateX(200%)}
 .roles button:focus-visible{outline:2px solid #fff;outline-offset:-3px;border-radius:3px}
 
 /* ---------- type ---------- */
-h2{font:600 24px/1.15 "Barlow Condensed",sans-serif;margin:0 0 3px;letter-spacing:.01em}
+h2{font:600 24px/1.15 "Barlow Condensed","Arial Narrow",sans-serif;margin:0 0 3px;letter-spacing:.01em}
 .sub{margin:0 0 18px;color:var(--ink-soft);font-size:14px}
 .eyebrow{
   font:600 11px/1 "Public Sans",sans-serif;letter-spacing:.09em;
@@ -124,19 +133,36 @@ h2{font:600 24px/1.15 "Barlow Condensed",sans-serif;margin:0 0 3px;letter-spacin
 /* ---------- readiness selector ----------
    Five across, two rows. The previous build ran ten across, which measured
    26x40px at 360px wide - under the 44px minimum touch target. */
+.private{
+  display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:9px 11px;
+  background:var(--blue-tint);border-radius:8px;
+  color:var(--blue-deep);font-size:13px;font-weight:500;line-height:1.3;
+}
+.private svg{flex:0 0 14px}
+
 .lanes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .lanes button{
   aspect-ratio:1/.92;border:1.5px solid var(--line);background:var(--paper);
   border-radius:10px;cursor:pointer;color:var(--ink);
   font:600 19px/1 "Public Sans",sans-serif;padding:0;
   font-variant-numeric:tabular-nums;
-  transition:background .12s ease, border-color .12s ease, color .12s ease;
+  position:relative;transition:transform .12s ease-out;
 }
-.lanes button:hover{border-color:var(--blue-line);background:var(--blue-tint)}
+/* Every number selects the same way. A 2 looks exactly like a 9. */
 .lanes button[aria-pressed="true"]{
   background:var(--blue);border-color:var(--blue);color:#fff;
 }
 .scale{display:flex;justify-content:space-between;color:var(--ink-soft);font-size:12px;margin-top:10px}
+
+/* The one motif: a lane rope. Used between the two rows of lanes and as the
+   page's closing divider, nowhere else. */
+.rope{
+  display:block;height:4px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    var(--blue) 0 10px, transparent 10px 12px,
+    var(--blue-line) 12px 22px, transparent 22px 24px);
+}
+.lanes .rope{grid-column:1/-1}
 
 .sleep{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .sleep button{
@@ -144,10 +170,22 @@ h2{font:600 24px/1.15 "Barlow Condensed",sans-serif;margin:0 0 3px;letter-spacin
      minimum touch target. */
   padding:13px 0;min-height:46px;border:1.5px solid var(--line);background:var(--paper);
   border-radius:10px;font:500 14px/1 "Public Sans",sans-serif;color:var(--ink);cursor:pointer;
-  transition:background .12s ease, border-color .12s ease, color .12s ease;
+  position:relative;transition:transform .12s ease-out;
 }
-.sleep button:hover{border-color:var(--blue-line);background:var(--blue-tint)}
 .sleep button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.lanes button:active,.sleep button:active{transform:scale(.96)}
+@media (hover:hover){
+  .lanes button:not([aria-pressed="true"]):hover,
+  .sleep button:not([aria-pressed="true"]):hover{border-color:var(--blue-line);background:var(--blue-tint)}
+}
+/* One ripple on selection, to confirm the tap. */
+.lanes button[aria-pressed="true"]::after,
+.sleep button[aria-pressed="true"]::after{
+  content:"";position:absolute;inset:-1.5px;border-radius:inherit;
+  border:2px solid var(--blue);pointer-events:none;
+  animation:ripple .3s ease-out both;
+}
+@keyframes ripple{from{opacity:.55;transform:scale(1)}to{opacity:0;transform:scale(1.2)}}
 
 textarea{
   width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px;
@@ -188,9 +226,7 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
   background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--blue);
   border-radius:var(--radius);padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow);
 }
-.banner.low{border-left-color:var(--severe)}
-.banner.full{border-left-color:var(--ok)}
-.banner strong{display:block;font:600 19px/1.15 "Barlow Condensed",sans-serif;margin-bottom:4px;letter-spacing:.01em}
+.banner strong{display:block;font:600 19px/1.15 "Barlow Condensed","Arial Narrow",sans-serif;margin-bottom:4px;letter-spacing:.01em}
 .banner p{margin:0;font-size:14px;color:var(--ink-soft)}
 
 .lift{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -198,34 +234,54 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 .lift .nm{font-weight:600;font-size:15px}
 .lift .rs{font-size:13px;color:var(--ink-soft);margin-top:1px}
 .load{font:700 21px/1 "Public Sans",sans-serif;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-.load .was{font-size:13px;color:var(--ink-soft);text-decoration:line-through;margin-right:8px;font-weight:500}
+/* The old weight appears once the new one has settled. Same blue at every
+   readiness: the athlete side never signals "bad". */
+.load .was{
+  display:inline-block;font-size:13px;color:var(--ink-soft);text-decoration:line-through;
+  margin-right:8px;font-weight:500;
+  opacity:0;transform:translateX(6px);transition:opacity .2s ease-out, transform .2s ease-out;
+}
+.settled .load .was{opacity:1;transform:none}
 .load .now{color:var(--blue)}
-.load .now.cut{color:var(--warn)}
+
+.confirm{
+  display:flex;align-items:center;gap:8px;margin:0 0 3px;padding-bottom:13px;
+  border-bottom:1px solid var(--line);font-weight:600;font-size:14px;color:var(--blue);
+}
+.confirm svg{flex:0 0 18px;animation:pop .24s ease-out both}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
 
 .reveal{animation:rise .28s ease-out both}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){
-  .reveal{animation:none}
-  *{transition:none !important}
+  *,*::before,*::after{animation:none !important;transition:none !important}
 }
 
 /* ---------- staff ---------- */
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
-.stat{
-  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  padding:13px 12px;box-shadow:var(--shadow);
-}
-.stat b{display:block;font:700 25px/1 "Public Sans",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.stat span{font-size:11.5px;color:var(--ink-soft);display:block;margin-top:3px;line-height:1.3}
+/* Coach view reads as a Z: title top left, count top right, then down through
+   the flag list. The team numbers sit under the list as one quiet line. */
+.headrow{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}
+.tally{margin:0 0 4px;text-align:right;font-size:12px;line-height:1.25;color:var(--ink-soft);white-space:nowrap}
+.tally b{display:block;font:700 30px/1 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.stats{display:flex;flex-wrap:wrap;gap:4px 20px;margin:0 2px 14px;font-size:13px;color:var(--ink-soft)}
+.stats b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 
+/* Rows run to the card edge so the whole strip reads as one thing to tap. */
 .flagrow{
-  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
-  padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;
-  background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;
+  display:flex;gap:12px;align-items:flex-start;text-align:left;
+  width:calc(100% + 34px);margin:0 -17px;padding:14px 17px;
+  border:0;border-bottom:1px solid var(--line);cursor:pointer;
+  background:none;font:inherit;color:inherit;
 }
+.flagrow:first-child{margin-top:-17px;border-radius:11px 11px 0 0}
 .flagrow:last-of-type{border-bottom:0}
-.tick{width:4px;align-self:stretch;background:var(--severe);flex:0 0 4px;border-radius:2px}
-.tick.warn{background:var(--warn)}
+.flagrow:active{background:var(--blue-tint)}
+@media (hover:hover){.flagrow:hover{background:#F7F9FE}}
+/* Flag kind by shape as well as colour: filled circle = reported low,
+   open square = missed check-ins, triangle = trend. */
+.mark{flex:0 0 16px;margin-top:3px;color:var(--blue)}
+.mark.warn{color:var(--miss)}
+.chev{flex:0 0 8px;align-self:center;color:var(--ink-soft)}
 .flagrow .body{flex:1;min-width:0}
 .flagrow .nm{font-weight:600;font-size:15px;margin:0;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
 /* These are spans inside a <button>, so they need display:block explicitly.
@@ -233,17 +289,21 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 .flagrow .why{display:block;margin:3px 0 0;font-size:13px;color:var(--ink-soft)}
 .count{
   font:600 11px/1 "Public Sans",sans-serif;letter-spacing:.04em;text-transform:uppercase;
-  color:var(--severe);background:#FBEAE8;border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;
+  color:var(--blue);background:var(--blue-tint);border-radius:999px;padding:5px 9px;white-space:nowrap;flex:0 0 auto;
 }
-.count.warn{color:var(--warn);background:#FBF0DE}
+.count.warn{color:var(--miss);background:var(--miss-tint)}
 .when{display:block;font-size:12px;color:var(--ink-soft);margin-top:5px;font-variant-numeric:tabular-nums}
 .note{
   font-size:13px;color:var(--ink-soft);border-top:1px solid var(--line);
   padding-top:13px;margin-top:14px;
 }
+.flagrow + .note{margin:0}
+/* Headings take focus on view change for screen readers; no ring needed. */
+h2:focus{outline:none}
 .empty{color:var(--ink-soft);font-size:14px;padding:6px 0 2px;margin:0}
 
-.foot{margin-top:28px;padding-top:15px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
+.foot{margin-top:15px;font-size:12px;color:var(--ink-soft)}
+.wrap > .rope{margin-top:28px;opacity:.55}
 .hide{display:none}
 </style>
 </head>
@@ -265,10 +325,11 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
         <p>Prototype. Sample data, no real athletes.</p>
       </div>
     </div>
-    <div class="roles" role="tablist" aria-label="Preview as">
+    <div class="roles" role="tablist" aria-label="Preview as" data-role="athlete">
       <button id="tabA" role="tab" aria-selected="true" onclick="setRole('athlete')">Athlete</button>
       <button id="tabC" role="tab" aria-selected="false" onclick="setRole('coach')">Coach</button>
       <button id="tabT" role="tab" aria-selected="false" onclick="setRole('trainer')">Trainer</button>
+      <span class="ink" role="presentation"></span>
     </div>
   </header>
 
@@ -280,8 +341,13 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 
     <div class="card">
       <p class="q">How ready do you feel today?</p>
-      <p class="hint">10 is fresh and ready to push. 1 is running on empty.</p>
+      <p class="hint" style="margin-bottom:10px">10 is fresh and ready to push. 1 is running on empty.</p>
+      <p class="private">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="2" y="6" width="10" height="7" rx="1.6" fill="currentColor"/><path d="M4.4 6V4.3a2.6 2.6 0 0 1 5.2 0V6" stroke="currentColor" stroke-width="1.6"/></svg>
+        Your coach sees a flag, not your number.
+      </p>
       <div class="lanes" id="lanes"></div>
+      <noscript><p class="hint" style="margin:0">This check-in needs JavaScript. Turn it on and reload the page.</p></noscript>
       <div class="scale"><span>Empty</span><span>Fresh</span></div>
     </div>
 
@@ -304,35 +370,40 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 
   <!-- COACH -->
   <section id="coach" class="hide">
-    <p class="eyebrow">Tuesday · Group A</p>
-    <h2 tabindex="-1">Your flag list</h2>
+    <div class="headrow">
+      <div>
+        <p class="eyebrow">Tuesday · Group A</p>
+        <h2 tabindex="-1">Your flag list</h2>
+      </div>
+      <p class="tally"><b>2</b>on your list</p>
+    </div>
     <p class="sub">Athletes who reported low, or stopped checking in. Daily numbers stay between the athlete and the training staff.</p>
 
-    <div class="stats">
-      <div class="stat"><b>24</b><span>of 26 checked in</span></div>
-      <div class="stat"><b>92%</b><span>compliance, 7 days</span></div>
-      <div class="stat"><b>2</b><span>on your list</span></div>
-    </div>
-
+    <!-- Dates marked data-ago are rewritten in JS as "today minus N days", so
+         the demo never looks stale. The text here is the no-JS fallback. -->
     <div class="card">
       <button class="flagrow" onclick="detail('coach')">
-        <span class="tick"></span>
+        <svg class="mark" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/></svg>
         <span class="body">
           <span class="nm">Athlete 07 <span class="count">3rd time</span></span>
           <span class="why">Reported 3 or below. Trainer notified 11:42am.</span>
-          <span class="when">Today · Sep 2 · Aug 28</span>
+          <span class="when">Today · <span data-ago="7">Sep 2</span> · <span data-ago="12">Aug 28</span></span>
         </span>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <button class="flagrow" onclick="detail('coach')">
-        <span class="tick warn"></span>
+        <svg class="mark warn" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2.2" y="2.2" width="11.6" height="11.6" rx="2" stroke="currentColor" stroke-width="2.4"/></svg>
         <span class="body">
           <span class="nm">Athlete 19 <span class="count warn">4 days</span></span>
           <span class="why">No check-in for 4 straight lifting days.</span>
-          <span class="when">Last check-in Sep 1</span>
+          <span class="when">Last check-in <span data-ago="8">Sep 1</span></span>
         </span>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <p class="note">You can override any automatic load change. Overrides are logged so the pattern stays readable later.</p>
     </div>
+
+    <p class="stats"><span><b>24</b> of 26 checked in</span><span><b>92%</b> compliance, 7 days</span></p>
 
     <div class="card">
       <p class="q">Team trend, last 10 sessions</p>
@@ -350,33 +421,37 @@ textarea:focus{outline:2px solid var(--blue);outline-offset:-1px}
 
     <div class="card">
       <button class="flagrow" onclick="detail('trainer')">
-        <span class="tick"></span>
+        <svg class="mark" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/></svg>
         <span class="body">
           <span class="nm">Athlete 07 <span class="count">3rd time</span></span>
           <span class="why">Readiness 2. Own 14-day average 6.8.</span>
-          <span class="when">Today · Sep 2 · Aug 28 · note left today</span>
+          <span class="when">Today · <span data-ago="7">Sep 2</span> · <span data-ago="12">Aug 28</span> · note left today</span>
         </span>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <button class="flagrow" onclick="detail('trainer')">
-        <span class="tick warn"></span>
+        <svg class="mark warn" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2.2" y="2.2" width="11.6" height="11.6" rx="2" stroke="currentColor" stroke-width="2.4"/></svg>
         <span class="body">
           <span class="nm">Athlete 19 <span class="count warn">4 days</span></span>
           <span class="why">No check-in for 4 straight lifting days.</span>
-          <span class="when">Last check-in Sep 1</span>
+          <span class="when">Last check-in <span data-ago="8">Sep 1</span></span>
         </span>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <button class="flagrow" onclick="detail('trainer')">
-        <span class="tick warn"></span>
+        <svg class="mark warn" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3h13L8 14.5z" fill="currentColor"/></svg>
         <span class="body">
           <span class="nm">Athlete 12 <span class="count warn">Trend</span></span>
           <span class="why">Readiness 6. That is 2.4 below their own 14-day average.</span>
           <span class="when">Coach does not see this one</span>
         </span>
+        <svg class="chev" width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <p class="note">Athlete 12 never reported a low number. They dropped against their own normal, which is why only this view catches it.</p>
     </div>
   </section>
 
+  <span class="rope" aria-hidden="true"></span>
   <p class="foot">Prototype for discussion. Load percentages, flag rules, and visibility settings are all adjustable. Nothing here is medical advice.</p>
 </div>
 
@@ -392,6 +467,21 @@ for (var i = 1; i <= 10; i++) {
   b.dataset.v = i;
   b.onclick = function () { pick('readiness', this); };
   lanes.appendChild(b);
+  if (i === 5) {
+    var rope = document.createElement('span');
+    rope.className = 'rope';
+    rope.setAttribute('aria-hidden', 'true');
+    lanes.appendChild(rope);
+  }
+}
+
+// Flag dates are "today minus N days" so the demo never looks stale.
+var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+var agoEls = document.querySelectorAll('[data-ago]');
+for (var a = 0; a < agoEls.length; a++) {
+  var d = new Date();
+  d.setDate(d.getDate() - Number(agoEls[a].getAttribute('data-ago')));
+  agoEls[a].textContent = MONTHS[d.getMonth()] + ' ' + d.getDate();
 }
 
 var sleepWrap = document.getElementById('sleep');
@@ -405,7 +495,7 @@ var sleepWrap = document.getElementById('sleep');
 });
 
 function pick(field, el) {
-  var siblings = el.parentNode.children;
+  var siblings = el.parentNode.querySelectorAll('button');
   for (var i = 0; i < siblings.length; i++) siblings[i].setAttribute('aria-pressed', 'false');
   el.setAttribute('aria-pressed', 'true');
   if (field === 'readiness') readiness = Number(el.dataset.v); else sleep = Number(el.dataset.v);
@@ -441,10 +531,14 @@ function submit() {
   var rows = lifts.map(function (l) {
     var adj = Math.round(l.load * b.f / 5) * 5;
     var was = b.f < 1 ? '<span class="was">' + l.load + '</span>' : '';
-    var cls = b.f < 1 ? 'now cut' : 'now';
+    // Starts on the programmed weight; settle() counts it to the adjusted one.
     return '<div class="lift"><div><div class="nm">' + l.nm + '</div><div class="rs">' + l.rs + '</div></div>' +
-           '<div class="load">' + was + '<span class="' + cls + '">' + adj + ' lb</span></div></div>';
+           '<div class="load">' + was + '<span class="now" data-from="' + l.load + '" data-to="' + adj + '">' +
+           l.load + ' lb</span></div></div>';
   }).join('');
+  var check = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">' +
+    '<circle cx="9" cy="9" r="9" fill="currentColor"/>' +
+    '<path d="M5 9.4l2.7 2.7L13 6.6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   document.getElementById('checkin').classList.add('hide');
   var w = document.getElementById('workout');
@@ -454,12 +548,46 @@ function submit() {
     '<h2 tabindex="-1">Weight room</h2>' +
     '<p class="sub">Readiness ' + readiness + ' of 10.</p>' +
     '<div class="banner ' + b.cls + '"><strong>' + b.title + '</strong><p>' + b.copy + '</p></div>' +
-    '<div class="card">' + rows + '</div>' +
+    '<div class="card"><p class="confirm" role="status">' + check + '<span>Got it. Adjusting your loads.</span></p>' + rows + '</div>' +
     '<button class="go" onclick="alert(\'Session logged.\')">Mark session complete</button>' +
     '<button class="ghost" onclick="reset()">Try another readiness score</button>';
 
   focusHeading(w.querySelector('h2'));
   window.scrollTo(0, 0);
+  settle(w, b.f < 1);
+}
+
+// A beat for the confirmation, then each load counts from the programmed
+// weight to the adjusted one. Reduced motion, or nothing to adjust: show the
+// final numbers straight away.
+function settle(w, changed) {
+  var nows = w.querySelectorAll('.now');
+  var msg = w.querySelector('.confirm span');
+  var finished = false;
+  function done() {
+    finished = true;
+    for (var i = 0; i < nows.length; i++) nows[i].textContent = nows[i].dataset.to + ' lb';
+    w.classList.add('settled');
+    msg.textContent = 'Got it. Loads set for today.';
+  }
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!changed || still || !window.requestAnimationFrame) { done(); return; }
+
+  var DURATION = 300, start = null;
+  function step(t) {
+    if (finished) return;
+    if (start === null) start = t;
+    var p = Math.min(1, (t - start) / DURATION);
+    var eased = 1 - Math.pow(1 - p, 3);
+    for (var i = 0; i < nows.length; i++) {
+      var from = Number(nows[i].dataset.from), to = Number(nows[i].dataset.to);
+      nows[i].textContent = Math.round(from + (to - from) * eased) + ' lb';
+    }
+    if (p < 1) requestAnimationFrame(step); else done();
+  }
+  setTimeout(function () { requestAnimationFrame(step); }, 450);
+  // Frames pause in a background tab. Never leave the old weights showing.
+  setTimeout(function () { if (!finished) done(); }, 1100);
 }
 
 function reset() {
@@ -479,6 +607,7 @@ function setRole(r) {
   for (var key in tabs) {
     document.getElementById(tabs[key]).setAttribute('aria-selected', String(key === r));
   }
+  document.querySelector('.roles').setAttribute('data-role', r);
   document.getElementById('coach').className = (r === 'coach') ? 'reveal' : 'hide';
   document.getElementById('trainer').className = (r === 'trainer') ? 'reveal' : 'hide';
 
